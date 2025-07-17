@@ -38,7 +38,7 @@ if page == "Dashboard Overview":
 
     # Infection ratio by county
     st.markdown("### Top 10 Counties by Infections Reported")
-    top_counties = df.groupby("County")["Infections_Reported"].median().sort_values(ascending=False).head(10)
+    top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=False).head(10)
     st.bar_chart(top_counties)
 
     # SIR by Operative Procedure
