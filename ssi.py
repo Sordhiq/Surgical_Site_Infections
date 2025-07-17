@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 # Page configuration
 st.set_page_config(page_title="California SSI Analytics Dashboard", layout="wide")
-
+ 
 # Load dataset
 @st.cache_data
 def load_data():
