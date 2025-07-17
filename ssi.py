@@ -19,7 +19,7 @@ df = load_data()
 
 # Sidebar
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "AI Policy Recommendations"])
+page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "Policy Recommendations"])
 
 # Dashboard Overview
 if page == "Dashboard Overview":
@@ -73,8 +73,8 @@ elif page == "Hypothesis Testing":
     st.pyplot(fig2)
 
 # AI Recommendations
-elif page == "AI Policy Recommendations":
-    st.title("AI-driven Health Policy Recommendations")
+elif page == "Policy Recommendations":
+    st.title("Health Policy Recommendations")
 
     # User input for context
     user_context = st.text_area("Provide additional context (optional):", "")
