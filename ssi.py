@@ -8,7 +8,13 @@ import google.generativeai as genai
 
 # Page configuration
 st.set_page_config(page_title="California SSI Analytics App", page_icon="⚕️", layout="wide")
- 
+html_temp = """
+    <div style="background-color:tomato;padding:13px">
+        <h1 style="color:white;text-align:center;">Byte x Brains 💻🧠</h1>
+    </div>
+    """
+    st.markdown(html_temp, unsafe_allow_html=True)
+
 # Load dataset
 @st.cache_data
 def load_data():
