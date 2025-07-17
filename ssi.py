@@ -1,100 +1,102 @@
+streamlit_code = '''
 import streamlit as st
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy.stats as stats
 import numpy as np
+import google.generativeai as genai
 
-# --------------------------------------
-# Load Dataset
-# --------------------------------------
-st.title("🧼 Surgical Site Infections Dashboard – California")
+# Page configuration
+st.set_page_config(page_title="California SSI Analytics Dashboard", layout="wide")
 
-uploaded_file = st.file_uploader("📁 Upload SSI dataset (CSV)", type="csv")
-if uploaded_file:
-    data = pd.read_csv(uploaded_file)
-    st.success("Dataset loaded successfully!")
+# Load dataset
+@st.cache_data
+def load_data():
+    df = pd.read_csv("cleaned_ssi_data.csv")
+    return df
 
-    # --------------------------------------
-    # Data Cleaning Functions
-    # --------------------------------------
-    def clean_data(data):
-        # Compute SIR
-        valid_pred = (data['Infections_Predicted'] >= 0.2)
-        valid_calc = valid_pred & (data['Infections_Predicted'] != 0) & (data['SIR'].isnull())
-        data.loc[valid_calc, 'SIR'] = data.loc[valid_calc, 'Infections_Reported'] / data.loc[valid_calc, 'Infections_Predicted']
-        data['SIR'] = data.groupby(['HAI', 'Operative_Procedure'])['SIR'].transform(lambda x: x.fillna(x.median()))
+df = load_data()
 
-        # Impute CIs
-        for col in ['SIR_CI_95_Lower_Limit', 'SIR_CI_95_Upper_Limit']:
-            data[col] = data.groupby(['HAI', 'Operative_Procedure'])[col].transform(lambda x: x.fillna(x.median()))
+# Sidebar
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "AI Policy Recommendations"])
 
-        # Define Comparison
-        def determine_comparison(row):
-            if pd.isnull(row['SIR_CI_95_Lower_Limit']) or pd.isnull(row['SIR_CI_95_Upper_Limit']):
-                return np.nan
-            elif row['SIR_CI_95_Lower_Limit'] > 1:
-                return "Worse than National"
-            elif row['SIR_CI_95_Upper_Limit'] < 1:
-                return "Better than National"
-            else:
-                return "No Different"
-        data['Comparison'] = data['Comparison'].fillna(data.apply(determine_comparison, axis=1))
+# Dashboard Overview
+if page == "Dashboard Overview":
+    st.title("Standardized Surgical Infection (SSI) Analytics - California")
+    st.subheader("Key Metrics and Visualizations")
 
-        # Met 2020 Goal
-        def met_2020_goal(row):
-            if pd.isna(row['SIR']) or row['Year'] < 2021:
-                return np.nan
-            return "Yes" if row['SIR'] < 0.70 else "No"
-        data['Met_2020_Goal'] = data['Met_2020_Goal'].fillna(data.apply(met_2020_goal, axis=1))
+    # Summary stats
+    st.markdown("### Summary Statistics")
+    st.write(df.describe())
 
-        # SIR_2015 Imputation
-        valid_sir2015 = (data['Infections_Predicted'] >= 0.2) & (data['SIR_2015'].isnull())
-        data.loc[valid_sir2015, 'SIR_2015'] = data.groupby(['Facility_ID', 'HAI'])['SIR_2015'].transform(lambda x: x.fillna(x.median()))
-        data['SIR_2015'] = data.groupby('HAI')['SIR_2015'].transform(lambda x: x.fillna(x.median()))
-        data['SIR_2015'].fillna(data['SIR_2015'].median(), inplace=True)
+    # Heatmap
+    st.markdown("### Correlation Heatmap")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", ax=ax)
+    st.pyplot(fig)
 
-        # Missing Reason and Flag
-        def sir_missing_reason(row):
-            if not pd.isna(row['SIR']):
-                return "Calculated"
-            elif row['Infections_Predicted'] < 0.2:
-                return "Below threshold (<0.2)"
-            elif row['Infections_Predicted'] == 0:
-                return "Zero predicted"
-            else:
-                return "Unknown"
-        data['SIR_Missing_Reason'] = data.apply(sir_missing_reason, axis=1)
-        data['SIR_missing_flag'] = data['SIR'].isnull().astype(int)
+    # Infection ratio by county
+    st.markdown("### Top 10 Counties by Infections Reported")
+    top_counties = df.groupby("County")["Infections_Reported"].sum().sort_values(ascending=False).head(10)
+    st.bar_chart(top_counties)
 
-        return data
+    # SIR by Operative Procedure
+    st.markdown("### Average SIR by Operative Procedure")
+    avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=False).dropna()
+    st.bar_chart(avg_sir_op)
 
-    # Clean the data
-    data_cleaned = clean_data(data)
+# Hypothesis Testing
+elif page == "Hypothesis Testing":
+    st.title("Hypothesis Testing")
 
-    # --------------------------------------
-    # Data Overview
-    # --------------------------------------
-    st.subheader("📊 Dataset Overview")
-    st.write(data_cleaned.head())
+    # T-test between large and small hospitals
+    st.markdown("### Comparing SIR between Hospitals by Bed Size")
+    small_hospitals = df[df['Hospital_Category_RiskAdjustment'] == 'Smaller hospitals (<250 beds)']['SIR'].dropna()
+    large_hospitals = df[df['Hospital_Category_RiskAdjustment'] == 'Larger hospitals (>=250 beds)']['SIR'].dropna()
 
-    st.subheader("🩺 Missing Value Summary")
-    st.write(data_cleaned.isnull().sum()[data_cleaned.isnull().sum() > 0])
+    t_stat, p_val = stats.ttest_ind(large_hospitals, small_hospitals, equal_var=False)
 
-    # --------------------------------------
-    # Visualizations
-    # --------------------------------------
-    st.subheader("📈 SIR Distribution by Year")
-    st.bar_chart(data_cleaned.groupby('Year')['SIR'].median())
+    st.write(f"**T-statistic:** {t_stat:.4f}")
+    st.write(f"**P-value:** {p_val:.4f}")
 
-    st.subheader("🏥 SIR by Facility Type")
-    if 'Facility_Type' in data_cleaned.columns:
-        st.bar_chart(data_cleaned.groupby('Facility_Type')['SIR'].median())
+    if p_val < 0.05:
+        st.success("There is a statistically significant difference in SIR between large and small hospitals (p < 0.05).")
+    else:
+        st.info("No statistically significant difference in SIR between large and small hospitals.")
 
-    st.subheader("✅ Met 2020 Goal by Year")
-    met_goal_counts = data_cleaned.groupby(['Year', 'Met_2020_Goal']).size().unstack()
-    st.bar_chart(met_goal_counts)
+    # Boxplot
+    st.markdown("### SIR Distribution by Hospital Size")
+    fig2, ax2 = plt.subplots(figsize=(8, 5))
+    sns.boxplot(x="Hospital_Category_RiskAdjustment", y="SIR", data=df)
+    plt.xticks(rotation=30)
+    st.pyplot(fig2)
 
-    # --------------------------------------
-    # Download Cleaned Data
-    # --------------------------------------
-    st.subheader("⬇️ Download Cleaned Dataset")
-    csv = data_cleaned.to_csv(index=False).encode('utf-8')
-    st.download_button("Download CSV", csv, "cleaned_ssi_data.csv", "text/csv")
+# AI Recommendations
+elif page == "AI Policy Recommendations":
+    st.title("AI-driven Health Policy Recommendations")
+
+    # User input for context
+    user_context = st.text_area("Provide additional context (optional):", "")
+
+    if st.button("Generate Recommendations"):
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+
+        prompt = (
+            "As a health policy analyst, generate 5 actionable and evidence-based policy recommendations "
+            "to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California. "
+            f"Use the following context if useful:\n{user_context}"
+        )
+
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
+
+        st.markdown("### AI Recommendations")
+        st.write(response.text)
+'''
+
+with open("/mnt/data/streamlit_app.py", "w") as f:
+    f.write(streamlit_code)
+
+"/mnt/data/streamlit_app.py"
