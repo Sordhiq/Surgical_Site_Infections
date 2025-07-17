@@ -8,13 +8,10 @@ import google.generativeai as genai
 
 # Page configuration
 st.set_page_config(page_title="CSSI Analytics App", page_icon="⚕️", layout="wide")
-
-# Title
-st.subheader("Surgical Site Infection Analytics App")
-         
+     
 # Title banner
 html_temp = """
-    <div style="background-color:coral;padding:13px">
+    <div style="background-color:teal;padding:13px">
         <h1 style="color:white;text-align:center;">Byte x Brains 💻🧠</h1>
     </div>
 """
@@ -48,7 +45,7 @@ if df is not None:
     # Dashboard Overview
     # -----------------------------
     if page == "Dashboard Overview":
-        st.title("Standardized Surgical Infection (SSI) Analytics - California")
+        st.title("Surgical Site Infection (SSI) Analytics App")
         st.subheader("Key Metrics and Visualizations")
 
         st.markdown("### Summary Statistics")
