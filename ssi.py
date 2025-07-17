@@ -7,7 +7,7 @@ import numpy as np
 import google.generativeai as genai
 
 # Page configuration
-st.set_page_config(page_title="California SSI Analytics Dashboard", layout="wide")
+st.set_page_config(page_title="California SSI Analytics App", page_icon="⚕️", layout="wide")
  
 # Load dataset
 @st.cache_data
