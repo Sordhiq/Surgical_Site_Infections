@@ -57,8 +57,8 @@ elif page == "Hypothesis Testing":
 
     t_stat, p_val = stats.ttest_ind(large_hospitals, small_hospitals, equal_var=False)
 
-    st.write(f"**T-statistic:** {t_stat:.4f}")
-    st.write(f"**P-value:** {p_val:.4f}")
+    st.write(f"T-statistic: {t_stat:.4f}")
+    st.write(f"P-value: {p_val:.4f}")
 
     if p_val < 0.05:
         st.success("There is a statistically significant difference in SIR between large and small-sized hospital beds (p < 0.05).")
