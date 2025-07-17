@@ -1,4 +1,3 @@
-streamlit_code = '''
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -94,9 +93,6 @@ elif page == "AI Policy Recommendations":
 
         st.markdown("### AI Recommendations")
         st.write(response.text)
-'''
 
-with open("/mnt/data/streamlit_app.py", "w") as f:
+with open("/ssi.py", "w") as f:
     f.write(streamlit_code)
-
-"/mnt/data/streamlit_app.py"
