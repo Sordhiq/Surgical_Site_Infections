@@ -7,13 +7,15 @@ import numpy as np
 import google.generativeai as genai
 
 # Page configuration
-st.set_page_config(page_title="California SSI Analytics App", page_icon="⚕️", layout="wide")
+st.set_page_config(page_title="CSSI Analytics App", page_icon="⚕️", layout="wide")
 
+# Title
+st.subheader("Surgical Site Infection Analytics App")
+         
 # Title banner
 html_temp = """
-    <div style="background-color:tomato;padding:13px">
+    <div style="background-color:coral;padding:13px">
         <h1 style="color:white;text-align:center;">Byte x Brains 💻🧠</h1>
-        <h4 style="color:white;text-align:center;">Surgical Site Infection Analytics App</h4>
     </div>
 """
 st.markdown(html_temp, unsafe_allow_html=True)
@@ -21,11 +23,11 @@ st.markdown(html_temp, unsafe_allow_html=True)
 # -----------------------------
 # Sidebar
 # -----------------------------
-st.sidebar.title("Navigation")
+st.sidebar.title("Navigation Pane")
 page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "Policy Recommendations"])
 
 # File uploader
-st.sidebar.markdown("### Upload Your SSI Data (CSV)")
+st.sidebar.markdown("### Upload Your SSI Dataset (CSV)")
 uploaded_file = st.sidebar.file_uploader("Choose a CSV file", type=["csv"])
 
 # -----------------------------
@@ -59,13 +61,13 @@ if df is not None:
         st.pyplot(fig)
 
         # Infection ratio by county
-        st.markdown("### Top 10 Counties by Infections Reported")
-        top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=False).head(10)
+        st.markdown("### Average Top 10 Counties by Infections Reported")
+        top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=True).head(10)
         st.bar_chart(top_counties)
 
         # SIR by Operative Procedure
         st.markdown("### Average SIR by Operative Procedure")
-        avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=False).dropna()
+        avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=True).dropna()
         st.bar_chart(avg_sir_op)
 
     # -----------------------------
@@ -80,13 +82,13 @@ if df is not None:
 
         t_stat, p_val = stats.ttest_ind(large_hospitals, small_hospitals, equal_var=False)
 
-        st.write(f"T-statistic: {t_stat:.4f}")
-        st.write(f"P-value: {p_val:.4f}")
+        st.write(f"T-statistic: {t_stat}")
+        st.write(f"P-value: {p_val}")
 
         if p_val < 0.05:
-            st.success("There is a statistically significant difference in SIR between large and small-sized hospital beds (p < 0.05).")
+            st.success("There is a statistically significant difference in infection ratio between large and small-sized hospital beds (p < 0.05).")
         else:
-            st.info("No statistically significant difference in SIR between large and small-sized hospital beds.")
+            st.info("There is no statistically significant difference in infection ratoio between large and small-sized hospital beds.")
 
         # Boxplot
         st.markdown("### SIR Distribution by Hospital Size")
@@ -103,12 +105,13 @@ if df is not None:
 
         user_context = st.text_area("Provide additional context (optional):", "")
 
-        if st.button("Generate Recommendations"):
+        if st.button("Generate Recommendations"):   
             genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
+           
             prompt = (
-                "As a health policy analyst, generate 5 actionable and evidence-based policy recommendations "
-                "to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California. "
+                "You are an exoerienced health policy analyst, generate 5 actionable and evidence-based policy recommendations "
+                "to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California."
+                "Make the recommendation as simple and relatable as possible."
                 f"Use the following context if useful:\n{user_context}"
             )
 
