@@ -93,6 +93,3 @@ elif page == "Policy Recommendations":
 
         st.markdown("### AI Recommendations")
         st.write(response.text)
-
-with open("/ssi.py", "w") as f:
-    f.write(streamlit_code)
