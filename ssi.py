@@ -38,7 +38,7 @@ if page == "Dashboard Overview":
 
     # Infection ratio by county
     st.markdown("### Top 10 Counties by Infections Reported")
-    top_counties = df.groupby("County")["Infections_Reported"].sum().sort_values(ascending=False).head(10)
+    top_counties = df.groupby("County")["Infections_Reported"].median().sort_values(ascending=False).head(10)
     st.bar_chart(top_counties)
 
     # SIR by Operative Procedure
@@ -61,9 +61,9 @@ elif page == "Hypothesis Testing":
     st.write(f"**P-value:** {p_val:.4f}")
 
     if p_val < 0.05:
-        st.success("There is a statistically significant difference in SIR between large and small hospitals (p < 0.05).")
+        st.success("There is a statistically significant difference in SIR between large and small-sized hospital beds (p < 0.05).")
     else:
-        st.info("No statistically significant difference in SIR between large and small hospitals.")
+        st.info("No statistically significant difference in SIR between large and small-sized hospital beds.")
 
     # Boxplot
     st.markdown("### SIR Distribution by Hospital Size")
