@@ -103,7 +103,20 @@ if df is not None:
         user_context = st.text_area("Provide additional context (optional):", "")
 
         if st.button("Generate Recommendations"):   
-            genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+            def configure_gemini():
+                 """Configure Gemini API with API key from Streamlit secrets"""
+                 try:
+                      # Get API key from Streamlit secrets
+                      api_key = st.secrets["GEMINI_API_KEY"]
+                      genai.configure(api_key=api_key)
+                      return True
+                 except KeyError:
+                      st.error("🔑 API key not found in secrets.toml file.")
+                      return False
+                 except Exception as e:
+                      st.error(f"Error configuring API: {str(e)}")
+                      return False
+             
            
             prompt = (
                 "You are an exoerienced health policy analyst, generate 5 actionable and evidence-based policy recommendations "
