@@ -55,7 +55,7 @@ if page == "Homepage":
     👉 Use the sidebar (>>) at the top-left corner to navigate through the app.
     """)
     st.info("Proudly developed by:")
-    st.markdown("📌 Sodiq Jinad")
+    st.markdown("📌 [Sodiq Jinad](https://www.linkedin.com/in/sodiq-jinad)")
     st.markdown("📌 Jimoh Yusrah Tosin")
     st.markdown("📌 Abdulsalam Zulaikha")
     
