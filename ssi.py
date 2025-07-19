@@ -55,7 +55,8 @@ if page == "Homepage":
     👉 Use the sidebar (>>) at the top-left corner to navigate through the app.
     """)
     st.info("Proudly developed by:")
-    st.success("📌 Sodiq Jinad")
+    st.info("📌 Sodiq Jinad")
+    st.info("📌 Jimoh Yusrah Tosin")
 
 # -----------------------------
 # Dashboard Overview
@@ -84,7 +85,8 @@ elif page == "Dashboard Overview" and df is not None:
     st.bar_chart(avg_sir_op)
 
     st.info("Proudly developed by:")
-    st.success("📌 Sodiq Jinad")
+    st.info("📌 Sodiq Jinad")
+    st.info("📌 Jimoh Yusrah Tosin")
 
 # -----------------------------
 # Hypothesis Testing
@@ -145,8 +147,8 @@ elif page == "Policy Recommendations" and df is not None:
             st.markdown("### Tailored Recommendations")
             st.write(response.text)
 
-            st.info("Proudly developed by:")
-            st.success("📌 Sodiq Jinad")
+            st.info("📌 Sodiq Jinad")
+            st.info("📌 Jimoh Yusrah Tosin")
 
         except KeyError:
             st.error("🔑 GEMINI_API_KEY not found. Please add it to your `.streamlit/secrets.toml` file.")
