@@ -86,8 +86,6 @@ elif page == "Dashboard Overview" and df is not None:
     avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=True).dropna()
     st.bar_chart(avg_sir_op)
 
-    st.info("Proudly developed by:")
-    st.markdown("📌 Sodiq Jinad\n📌 Jimoh Yusrah Tosin\n Abdulsalam Zulaikha")
     
 # -----------------------------
 # Hypothesis Testing
@@ -96,18 +94,23 @@ elif page == "Hypothesis Testing" and df is not None:
     st.title("Hypothesis Testing")
 
     st.markdown("### Comparing SIR between Hospitals by Bed Size")
+    
+    # Filter data
     small_hospitals = df[df['Hospital_Category_RiskAdjustment'] == 'Smaller hospitals (<250 beds)']['SIR'].dropna()
     large_hospitals = df[df['Hospital_Category_RiskAdjustment'] == 'Larger hospitals (>=250 beds)']['SIR'].dropna()
 
+    # Perform t-test
     t_stat, p_val = stats.ttest_ind(large_hospitals, small_hospitals, equal_var=False)
 
-    st.write(f"T-statistic: {t_stat}")
-    st.write(f"P-value: {p_val}")
+    # Show stats
+    st.write(f"**T-statistic:** {t_stat:.4f}")
+    st.write(f"**P-value:** {p_val:.4f}")
 
+    # Interpret result
     if p_val < 0.05:
-        st.success("There is a statistically significant difference in infection ratio between large and small-sized hospital beds (p < 0.05).")
+        st.success("✅ There is a statistically significant difference in infection ratio between large and small-sized hospitals (p < 0.05).")
     else:
-        st.info("There is no statistically significant difference in infection ratio between large and small-sized hospital beds.")
+        st.info("ℹ️ There is no statistically significant difference in infection ratio between large and small-sized hospitals.")
 
     # Boxplot
     st.markdown("### SIR Distribution by Hospital Size")
@@ -148,8 +151,6 @@ elif page == "Policy Recommendations" and df is not None:
 
             st.markdown("### Tailored Recommendations")
             st.write(response.text)
-
-            
 
         except KeyError:
             st.error("🔑 GEMINI_API_KEY not found. Please add it to your `.streamlit/secrets.toml` file.")
