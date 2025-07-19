@@ -111,7 +111,6 @@ if df is not None:
 
     elif page == "Policy Recommendations":
         st.title("Health Policy Recommendations")
-    
         user_context = st.text_area("Provide additional context (optional):", "")
     
         if st.button("Generate Recommendations"):
