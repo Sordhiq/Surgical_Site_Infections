@@ -110,52 +110,54 @@ if df is not None:
         st.pyplot(fig2)
 
     elif page == "Policy Recommendations":
-    st.title("Health Policy Recommendations")
+        st.title("Health Policy Recommendations")
+    
+        user_context = st.text_area("Provide additional context (optional):", "")
+    
+        if st.button("Generate Recommendations"):
+            def configure_gemini():
+                """Configure Gemini API with API key from Streamlit secrets"""
+                try:
+                    api_key = st.secrets["GEMINI_API_KEY"]
+                    genai.configure(api_key=api_key)
+                    return True
+                except KeyError:
+                    st.error("🔑 API key not found in secrets.toml file.")
+                    return False
+                except Exception as e:
+                    st.error(f"Error configuring Gemini API: {str(e)}")
+                    return False
+    
+            if configure_gemini():
+                # Extract key findings from the dataset
+                avg_sir = df['SIR'].mean()
+                top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=False).head(3)
+                high_sir_procedures = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=False).dropna().head(3)
+    
+                top_counties_list = ", ".join(top_counties.index)
+                top_procedures_list = ", ".join(high_sir_procedures.index)
+    
+                data_summary = (
+                    f"Here are key findings from the SSI dataset:\n"
+                    f"- The average Standardized Infection Ratio (SIR) is approximately **{avg_sir:.2f}**.\n"
+                    f"- The counties with the highest reported infections include: **{top_counties_list}**.\n"
+                    f"- Procedures associated with the highest infection ratios include: **{top_procedures_list}**.\n"
+                )
+    
+                prompt = (
+                    "You are an experienced health policy analyst. Based on the summarized data insights below, "
+                    "generate 5 actionable and evidence-based policy recommendations to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California. "
+                    "Ensure the recommendations are simple, clear, and directly tied to the data.\n\n"
+                    f"{data_summary}\n"
+                    f"Additional context (if any):\n{user_context}"
+                )
+    
+                model = genai.GenerativeModel("gemini-pro")
+                response = model.generate_content(prompt)
+    
+                st.markdown("### Tailored Recommendations")
+                st.write(response.text)
 
-    user_context = st.text_area("Provide additional context (optional):", "")
-
-    if st.button("Generate Recommendations"):
-        def configure_gemini():
-            """Configure Gemini API with API key from Streamlit secrets"""
-            try:
-                api_key = st.secrets["GEMINI_API_KEY"]
-                genai.configure(api_key=api_key)
-                return True
-            except KeyError:
-                st.error("🔑 API key not found in secrets.toml file.")
-                return False
-            except Exception as e:
-                st.error(f"Error configuring Gemini API: {str(e)}")
-                return False
-
-        if configure_gemini():
-            # Extract key findings from the dataset
-            avg_sir = df['SIR'].mean()
-            top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=False).head(3)
-            high_sir_procedures = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=False).dropna().head(3)
-
-            top_counties_list = ", ".join(top_counties.index)
-            top_procedures_list = ", ".join(high_sir_procedures.index)
-
-            data_summary = (
-                f"Here are key findings from the SSI dataset:\n"
-                f"- The average Standardized Infection Ratio (SIR) is approximately **{avg_sir:.2f}**.\n"
-                f"- The counties with the highest reported infections include: **{top_counties_list}**.\n"
-                f"- Procedures associated with the highest infection ratios include: **{top_procedures_list}**.\n"
-            )
-
-            prompt = (
-                "You are an experienced health policy analyst. Based on the summarized data insights below, "
-                "generate 5 actionable and evidence-based policy recommendations to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California. "
-                "Ensure the recommendations are simple, clear, and directly tied to the data.\n\n"
-                f"{data_summary}\n"
-                f"Additional context (if any):\n{user_context}"
-            )
-
-            model = genai.GenerativeModel("gemini-pro")
-            response = model.generate_content(prompt)
-
-            st.markdown("### Tailored Recommendations")
-            st.write(response.text)
+    
 else:
     st.warning("❗ Please upload a valid CSV file or use the default dataset.")
