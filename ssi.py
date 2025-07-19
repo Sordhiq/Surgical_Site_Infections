@@ -9,7 +9,7 @@ import google.generativeai as genai
 # Page config
 st.set_page_config(page_title="SSI Analytics App", page_icon="⚕️", layout="wide")
 # Set title name
-st.title("Surgical Site Infections Analytics App")
+st.title("Surgical Site Infections App")
 # Title banner
 html_temp = """
     <div style="background-color:teal;padding:13px">
@@ -55,6 +55,9 @@ if page == "Homepage":
     👉 Use the sidebar (>>) at the top-left corner to navigate through the app.
     """)
     st.info("Proudly developed by:")
+    st.markdown("📌 Sodiq Jinad")
+    st.markdown("📌 Jimoh Yusrah Tosin")
+    st.markdown("📌 Abdulsalam Zulaikha")
     
 
 # -----------------------------
