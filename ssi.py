@@ -87,6 +87,7 @@ elif page == "Dashboard Overview" and df is not None:
     st.bar_chart(avg_sir_op)
 
     st.info("Proudly developed by:")
+    st.markdown("📌 Sodiq Jinad\n📌 Jimoh Yusrah Tosin\n Abdulsalam Zulaikha")
     
 # -----------------------------
 # Hypothesis Testing
