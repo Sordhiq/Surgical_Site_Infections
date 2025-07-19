@@ -7,19 +7,17 @@ import numpy as np
 import google.generativeai as genai
 
 # Page configuration
-st.set_page_config(page_title="CSSI Analytics App", page_icon="⚕️", layout="wide")
-     
+st.set_page_config(page_title="SSI Analytics App", page_icon="⚕️", layout="wide")
+
 # Title banner
 html_temp = """
     <div style="background-color:teal;padding:13px">
-        <h1 style="color:white;text-align:center;">Byte x Brains 💻🧠</h1>
+        <h2 style="color:white;text-align:center;">Byte x Brains 💻🧠</h2>
     </div>
 """
 st.markdown(html_temp, unsafe_allow_html=True)
 
-# -----------------------------
 # Sidebar
-# -----------------------------
 st.sidebar.title("Navigation Pane")
 page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "Policy Recommendations"])
 
@@ -27,9 +25,7 @@ page = st.sidebar.radio("Go to", ["Dashboard Overview", "Hypothesis Testing", "P
 st.sidebar.markdown("### Upload Your SSI Dataset (CSV)")
 uploaded_file = st.sidebar.file_uploader("Choose a CSV file", type=["csv"])
 
-# -----------------------------
 # Load Data
-# -----------------------------
 @st.cache_data
 def load_data(file=None):
     if file is not None:
@@ -40,12 +36,32 @@ def load_data(file=None):
 
 df = load_data(uploaded_file)
 
+# Check column structure
+expected_cols = ["County", "Infections_Reported", "SIR", "Operative_Procedure", "Hospital_Category_RiskAdjustment"]
+if not all(col in df.columns for col in expected_cols):
+    st.error("🚫 Uploaded file does not have the expected structure. Please upload a valid SSI dataset.")
+    st.stop()
+
 if df is not None:
-    # -----------------------------
-    # Dashboard Overview
-    # -----------------------------
     if page == "Dashboard Overview":
         st.title("Surgical Site Infection (SSI) Analytics App")
+        
+        # ABOUT SECTION
+        st.markdown("### 🩺 About the App")
+        st.markdown("""
+        This interactive dashboard is designed to help users analyze and interpret **Surgical Site Infection (SSI)** data 
+        from healthcare centers across California. It provides insights into infection trends, hospital risk factors, 
+        and performance indicators to support data-driven health policy decisions.
+
+        **How to Navigate:**
+        - Use the **sidebar** to switch between different pages.
+        - 📊 **Dashboard Overview**: View metrics, trends, and infection rates across counties and procedures.
+        - 🧪 **Hypothesis Testing**: Compare infection ratios using statistical methods.
+        - 📋 **Policy Recommendations**: Generate evidence-based strategies using AI to improve health outcomes.
+
+        Upload your custom CSV data or explore the built-in dataset to get started!
+        """)
+
         st.subheader("Key Metrics and Visualizations")
 
         st.markdown("### Summary Statistics")
@@ -55,21 +71,19 @@ if df is not None:
         st.markdown("### Correlation Heatmap")
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", ax=ax)
+        plt.tight_layout()
         st.pyplot(fig)
 
         # Infection ratio by county
-        st.markdown("### Average Top 10 Counties by Infections Reported")
-        top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=True).head(10)
+        st.markdown("### Top 10 Counties by Infections Reported")
+        top_counties = df.groupby("County")["Infections_Reported"].mean().sort_values(ascending=False).head(10)
         st.bar_chart(top_counties)
 
         # SIR by Operative Procedure
         st.markdown("### Average SIR by Operative Procedure")
-        avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=True).dropna()
+        avg_sir_op = df.groupby("Operative_Procedure")["SIR"].mean().sort_values(ascending=False).dropna()
         st.bar_chart(avg_sir_op)
 
-    # -----------------------------
-    # Hypothesis Testing
-    # -----------------------------
     elif page == "Hypothesis Testing":
         st.title("Hypothesis Testing")
 
@@ -85,50 +99,47 @@ if df is not None:
         if p_val < 0.05:
             st.success("There is a statistically significant difference in infection ratio between large and small-sized hospital beds (p < 0.05).")
         else:
-            st.info("There is no statistically significant difference in infection ratoio between large and small-sized hospital beds.")
+            st.info("There is no statistically significant difference in infection ratio between large and small-sized hospital beds.")
 
         # Boxplot
         st.markdown("### SIR Distribution by Hospital Size")
         fig2, ax2 = plt.subplots(figsize=(8, 5))
         sns.boxplot(x="Hospital_Category_RiskAdjustment", y="SIR", data=df)
         plt.xticks(rotation=30)
+        plt.tight_layout()
         st.pyplot(fig2)
 
-    # -----------------------------
-    # Policy Recommendations
-    # -----------------------------
     elif page == "Policy Recommendations":
         st.title("Health Policy Recommendations")
 
         user_context = st.text_area("Provide additional context (optional):", "")
 
-        if st.button("Generate Recommendations"):   
+        if st.button("Generate Recommendations"):
             def configure_gemini():
-                 """Configure Gemini API with API key from Streamlit secrets"""
-                 try:
-                      # Get API key from Streamlit secrets
-                      api_key = st.secrets["GEMINI_API_KEY"]
-                      genai.configure(api_key=api_key)
-                      return True
-                 except KeyError:
-                      st.error("🔑 API key not found in secrets.toml file.")
-                      return False
-                 except Exception as e:
-                      st.error(f"Error configuring API: {str(e)}")
-                      return False
-             
-           
-            prompt = (
-                "You are an exoerienced health policy analyst, generate 5 actionable and evidence-based policy recommendations "
-                "to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California."
-                "Make the recommendation as simple and relatable as possible."
-                f"Use the following context if useful:\n{user_context}"
-            )
+                """Configure Gemini API with API key from Streamlit secrets"""
+                try:
+                    api_key = st.secrets["GEMINI_API_KEY"]
+                    genai.configure(api_key=api_key)
+                    return True
+                except KeyError:
+                    st.error("🔑 API key not found in secrets.toml file.")
+                    return False
+                except Exception as e:
+                    st.error(f"Error configuring Gemini API: {str(e)}")
+                    return False
 
-            model = genai.GenerativeModel("gemini-pro")
-            response = model.generate_content(prompt)
+            if configure_gemini():
+                prompt = (
+                    "You are an experienced health policy analyst. Generate 5 actionable and evidence-based policy "
+                    "recommendations to help reduce the Standardized Surgical Infection Ratio (SIR) across health centers in California. "
+                    "Make the recommendations as simple and relatable as possible. "
+                    f"Use the following context if useful:\n{user_context}"
+                )
 
-            st.markdown("### Tailored Recommendations")
-            st.write(response.text)
+                model = genai.GenerativeModel("gemini-pro")
+                response = model.generate_content(prompt)
+
+                st.markdown("### Tailored Recommendations")
+                st.write(response.text)
 else:
     st.warning("❗ Please upload a valid CSV file or use the default dataset.")
