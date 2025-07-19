@@ -131,7 +131,7 @@ elif page == "Policy Recommendations" and df is not None:
                 "Keep recommendations realistic, relevant, and evidence-informed."
             )
 
-            model = genai.GenerativeModel("gemini-pro")
+            model = genai.GenerativeModel("gemini-1.5-flash")
             response = model.generate_content(prompt)
 
             st.markdown("### Tailored Recommendations")
