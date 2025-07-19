@@ -42,15 +42,19 @@ df = load_data(uploaded_file)
 if page == "Homepage":
     st.title("Welcome to the SSI Analytics App")
     st.markdown("""
-    This app is designed to analyze Surgical Site Infection (SSI) data and provide insights and policy recommendations to healthcare decision-makers.
+    This interactive dashboard is designed to help users analyze and interpret **Surgical Site Infection (SSI)** data\
+    from healthcare centers across California. It provides insights into infection trends, hospital risk factors,\
+    and performance indicators to support data-driven health policy decisions.
     
     #### Features:
     - **Dashboard Overview**: Get quick metrics and visualizations.
     - **Hypothesis Testing**: Compare infection rates between hospital types.
-    - **Policy Recommendations**: Generate tailored health policy ideas using Gemini AI based on data insights.
+    - **Policy Recommendations**: Generate tailored health policy ideas based on data insights.
     
-    👉 Use the sidebar to navigate through the app.
+    👉 Use the sidebar (>>) at the top-left corner to navigate through the app.
     """)
+    st.info("Proudly developed by:")
+    st.markdown("Sodiq Jinad")
 
 # -----------------------------
 # Dashboard Overview
@@ -124,11 +128,11 @@ elif page == "Policy Recommendations" and df is not None:
 
             prompt = (
                 "You are a seasoned public health policy analyst. Based on the data insights below, "
-                "generate 5 clear and practical recommendations to reduce the Standardized Surgical Infection Ratio (SIR) "
+                "In 300 words, generate 5 clear, simple and practical recommendations to reduce the Standardized Surgical Infection Ratio (SIR) "
                 "across California hospitals:\n\n"
                 f"Highest SIRs observed in procedures: {top_procedures_text}.\n\n"
                 f"User Context: {user_context if user_context else 'No additional context provided.'}\n\n"
-                "Keep recommendations realistic, relevant, and evidence-informed."
+                "Keep recommendations simple, realistic, relevant, evidence-informed and avoid the use of ambigous words."
             )
 
             model = genai.GenerativeModel("gemini-1.5-flash")
