@@ -56,8 +56,8 @@ if page == "Homepage":
     """)
     st.info("Proudly developed by:")
     st.markdown("📌 [Sodiq Jinad](https://www.linkedin.com/in/sodiq-jinad)")
-    st.markdown("📌 Jimoh Yusrah Tosin")
-    st.markdown("📌 Abdulsalam Zulaikha")
+    st.markdown("📌 [Jimoh Yusrah Tosin](https://bit.ly/3IwwReA)")
+    st.markdown("📌 [Abdulsalam Zulaikha](https://www.linkedin.com/in/zulaikhaabdulsalam)")
     
 
 # -----------------------------
