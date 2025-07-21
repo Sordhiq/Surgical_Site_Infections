@@ -143,7 +143,8 @@ elif page == "Policy Recommendations" and df is not None:
                 "across California hospitals:\n\n"
                 f"Highest SIRs observed in procedures: {top_procedures_text}.\n\n"
                 f"User Context: {user_context if user_context else 'No additional context provided.'}\n\n"
-                "Keep recommendations simple, realistic, relevant, evidence-informed and avoid the use of ambigous words."
+                "Keep recommendations simple, realistic, relevant, evidence-informed, and avoid the use of ambiguous words."
+                "Also make the recommendations contextualized to the findings from this analysis."
             )
 
             model = genai.GenerativeModel("gemini-1.5-flash")
