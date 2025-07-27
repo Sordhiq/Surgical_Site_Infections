@@ -13,7 +13,7 @@ st.title("Surgical Site Infections App")
 # Title banner
 html_temp = """
     <div style="background-color:teal;padding:13px">
-        <h1 style="color:white;text-align:center;">Byte x Brains 💻🧠</h1>
+        <h1 style="color:white;text-align:center;">Byte x Brains💻🧠</h1>
     </div>
 """
 st.markdown(html_temp, unsafe_allow_html=True)
@@ -46,6 +46,8 @@ if page == "Homepage":
     This interactive dashboard is designed to help users analyze and interpret **Surgical Site Infection (SSI)** data\
     from healthcare centers across California. It provides insights into infection trends, hospital risk factors,\
     and performance indicators to support data-driven health policy decisions.
+
+    You could either upload your SSI dataset or explore with our built-in dataset.
     
     #### Features:
     - **Dashboard Overview**: Get quick metrics and visualizations.
