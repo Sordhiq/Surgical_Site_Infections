@@ -105,8 +105,8 @@ elif page == "Hypothesis Testing" and df is not None:
     t_stat, p_val = stats.ttest_ind(large_hospitals, small_hospitals, equal_var=False)
 
     # Show stats
-    st.write(f"**T-statistic:** {t_stat:.4f}")
-    st.write(f"**P-value:** {p_val:.4f}")
+    st.write(f"T-statistic: {t_stat:.4f}")
+    st.write(f"P-value: {p_val:.4f}")
 
     # Interpret result
     if p_val < 0.05:
@@ -140,8 +140,8 @@ elif page == "Policy Recommendations" and df is not None:
             top_procedures_text = ", ".join(high_sir_procedures.index.tolist())
 
             prompt = (
-                "You are a seasoned public health policy analyst. Based on the data insights below, "
-                "In 300 words, generate 5 clear, simple and practical recommendations to reduce the Standardized Surgical Infection Ratio (SIR) "
+                "You are a seasoned public health policy analyst. Based on the data insights, summarize the insights in one simple paragraph and"
+                "In less than 300 words, generate 3 clear, simple and practical recommendations to reduce the Standardized Surgical Infection Ratio (SIR) "
                 "across California hospitals:\n\n"
                 f"Highest SIRs observed in procedures: {top_procedures_text}.\n\n"
                 f"User Context: {user_context if user_context else 'No additional context provided.'}\n\n"
