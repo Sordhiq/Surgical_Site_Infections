@@ -9,7 +9,7 @@ import google.generativeai as genai
 # Page config
 st.set_page_config(page_title="SSI Analytics App", page_icon="⚕️", layout="wide")
 # Set title name
-st.title("Surgical Site Infections App")
+st.title("Surgical Site Infections App") 
 # Title banner
 html_temp = """
     <div style="background-color:teal;padding:13px">
